@@ -32,4 +32,5 @@ pnpm-debug.log*
 # Docker / local overrides
 .env
 .env.*
+!backend/.env.example
 docker-compose.override.yml
