@@ -6,6 +6,7 @@ services:
       - "${BACKEND_PORT:-8083}:8083"
     volumes:
       - ./backend/data:/app/data
+      - ./backend/.env:/app/.env:ro
     restart: unless-stopped
 
   frontend:
