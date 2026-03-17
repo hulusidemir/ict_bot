@@ -77,7 +77,7 @@ app.include_router(trades_router)
 app.include_router(analytics_router)
 
 # Socket.IO mount
-sio_app = socketio.ASGIApp(sio, other_app=app)
+sio_app = socketio.ASGIApp(sio, app)
 
 
 @app.get("/api/status")
