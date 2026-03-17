@@ -36,6 +36,6 @@ class Settings(BaseSettings):
     # News times (EST hours, approximate - can be extended)
     high_impact_news_hours: List[int] = [8, 10, 14]
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 settings = Settings()
