@@ -27,10 +27,10 @@ class Settings(BaseSettings):
     ny_timezone: str = "America/New_York"
 
     # Signal defaults
-    equal_level_tolerance_pct: float = 0.05   # %0.05 tolerance for equal highs/lows
+    equal_level_tolerance_pct: float = 0.08   # %0.08 tolerance for equal highs/lows
     fvg_min_size_pct: float = 0.02            # minimum FVG size as % of price
-    lookback_candles: int = 20                # candles to check for equal levels
-    displacement_min_pct: float = 0.15        # min displacement size as % of price
+    lookback_candles: int = 50                # candles to check for equal levels
+    displacement_min_pct: float = 0.10        # min displacement size as % of price
     opening_range_gap_wide_points: float = 40 # "wide" ORG threshold
 
     # News times (EST hours, approximate - can be extended)

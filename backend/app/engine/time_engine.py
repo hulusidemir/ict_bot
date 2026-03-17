@@ -108,13 +108,17 @@ def get_active_session(dt: datetime.datetime | None = None) -> str:
 
 
 # ─── Signal eligibility ────────────────────────────────────
-# 09:31+ veya Makro pencereleri
+# Kripto 7/24 açık → her zaman sinyal üretilebilir.
+# Kill zone ve macro bilgisi etiketleme için kullanılır.
 
 def is_signal_eligible(dt: datetime.datetime | None = None) -> bool:
-    t = to_ny(dt) if dt else ny_now()
-    h, m = t.hour, t.minute
-    after_open = (h == 9 and m >= 31) or h > 9
-    return after_open or is_in_macro(t)
+    return True
+
+
+def is_in_kill_zone(dt: datetime.datetime | None = None) -> bool:
+    """Fiyat bir kill zone içinde mi? Daha kaliteli sinyaller üretir."""
+    session = get_active_session(dt)
+    return session in ("London", "NY_AM", "NY_PM", "Asian")
 
 
 # ─── News proximity check ──────────────────────────────────

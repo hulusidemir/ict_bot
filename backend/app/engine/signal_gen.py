@@ -23,7 +23,7 @@ logger = logging.getLogger("signal_gen")
 
 # Son üretilen sinyallerin takibi (duplicate önleme)
 _recent_signals: dict[str, datetime] = {}  # "BTCUSDT_LONG_ts" -> datetime
-SIGNAL_COOLDOWN_SECONDS = 300  # Aynı yönde 5dk cooldown
+SIGNAL_COOLDOWN_SECONDS = 180  # Aynı yönde 3dk cooldown
 
 # Socket.IO broadcast callback (main.py tarafından set edilir)
 _broadcast_signal = None
@@ -113,35 +113,38 @@ def detect_displacement(candles: list[dict], direction: str) -> bool:
 def detect_stop_hunt(candles: list[dict], liquidity: dict) -> dict | None:
     """
     Equal Highs veya Equal Lows'un sweep edilip edilmediğini kontrol eder.
-    Son mum likidit seviyeyi aşıp geri dönmüşse → stop hunt.
+    Son 3 mumun herhangi birinde likidit seviye aşılıp fiyat geri dönmüşse → stop hunt.
     """
-    if not candles:
+    if len(candles) < 4:
         return None
 
-    last = candles[-1]
-    prev_candles = candles[:-1]
+    recent = candles[-3:]  # Son 3 mumu kontrol et
+    last_close = candles[-1]["close"]
 
     # Equal Lows sweep → Bullish setup için
     for eq_low in liquidity.get("equal_lows", []):
         level = eq_low["price"]
-        # Son mum düşüp geri dönmüş mü?
-        if last["low"] < level and last["close"] > level:
+        swept = any(c["low"] < level for c in recent)
+        if swept and last_close > level:
+            lowest_wick = min(c["low"] for c in recent)
             return {
                 "type": "SWEEP_LOWS",
                 "level": level,
                 "direction": "BULLISH",
-                "wick_low": last["low"],
+                "wick_low": lowest_wick,
             }
 
     # Equal Highs sweep → Bearish setup için
     for eq_high in liquidity.get("equal_highs", []):
         level = eq_high["price"]
-        if last["high"] > level and last["close"] < level:
+        swept = any(c["high"] > level for c in recent)
+        if swept and last_close < level:
+            highest_wick = max(c["high"] for c in recent)
             return {
                 "type": "SWEEP_HIGHS",
                 "level": level,
                 "direction": "BEARISH",
-                "wick_high": last["high"],
+                "wick_high": highest_wick,
             }
 
     return None
